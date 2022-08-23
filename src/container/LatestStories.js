@@ -6,46 +6,32 @@ const LatestStories = () => {
 
     const [stories, setStories] = useState([]);
     const [filteredStories, setFilteredStories] = useState([]);
-    const [searchTerm, setSearchTerm] = useState("")
 
     const getStories = () => {
         fetch("https://hacker-news.firebaseio.com/v0/topstories.json")
-            .then((response) => response.json())
-            .then( (data) => {
-                const newData = data.slice(0, 20);
-                const storyFetchPromises = newData.map ((story) => {
-                    return fetch( `https://hacker-news.firebaseio.com/v0/item/${story}.json`)
-                                .then(data => data.json());
-                });
+            .then(rawStoryIndexArray => rawStoryIndexArray.json())
+            .then((storyIndexArray) => {
 
-                Promise.all(storyFetchPromises)
-                    .then((result) => {
-                        setStories(result);
-                        setFilteredStories(result);
+                const promiseArray = storyIndexArray.slice(0,20).map( (storyIndex, index) => {
+                    return fetch(`https://hacker-news.firebaseio.com/v0/item/${storyIndex}.json`)
+                                .then(rawStory => rawStory.json());
+                });
+                
+                Promise.all(promiseArray)
+                    .then(resolvedPromiseArray => {
+                        setStories(resolvedPromiseArray);
+                        setFilteredStories(resolvedPromiseArray);
                     })
             })
     }
 
-    useEffect( () => {
-        getStories();
-    }, [])
-
-    const filter = (searchTerm) => {
-        let searchTermInLowerCase = searchTerm.toLowerCase();
-        const filteredStories = stories.filter( (story) => {
-            return story.title.toLowerCase().indexOf(searchTermInLowerCase) > -1;
-        });
-        setFilteredStories(filteredStories);
-    }
+    useEffect( () => {getStories()}, [])
+    
     return (
         <>
-            <h1>I am the container</h1>
-            <Filter 
-                searchTerm={searchTerm} 
-                setSearchTerm={setSearchTerm} 
-                stories={filteredStories} 
-                filter={filter}/>
-            <StoryList stories={filteredStories}/> 
+            <h1>Latest from HackerNews: </h1>
+            <Filter stories={stories} setFilteredStories={setFilteredStories}/>
+            <StoryList stories={filteredStories}/>
         </>
     );
 }

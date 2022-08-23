@@ -1,25 +1,34 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 
-const Filter = ({searchTerm, setSearchTerm, filter}) => {
+const Filter = ({stories, setFilteredStories}) => {
 
-    const sethandleChange = (event) => {
-        setSearchTerm(event.target.value);
-        filter(searchTerm);
+    const [searchTerm, setSearchTerm] = useState("")
+
+    const handleSearchInput = (event) => {
+        setSearchTerm(event.target.value)
+        filterResults();
     }
 
-    useEffect( () => {
-        filter(searchTerm)
-    }, [])
+    const filterResults = () => {
+        const searchInputInLowerCase = searchTerm.toLowerCase();
+        const storiesMatchingSearch = stories.filter( (story) => {
+            return story.title.toLowerCase().includes(searchInputInLowerCase);
+        })
+        setFilteredStories(storiesMatchingSearch);
+    }
 
     const handleSubmit = (event) => {
-        event.preventDefault();
+        event.preventDefault()
     }
+
+    // useState(() => {
+    //     filterResults();
+    // }, [searchTerm, stories])
 
     return(
         <>
             <form onSubmit={handleSubmit}>
-                <input type="text" onChange={sethandleChange} value={searchTerm}/>
-                <input type="submit" hidden/>
+                <input type="text" value={searchTerm} onChange={handleSearchInput}/>
             </form>
         </>
     )

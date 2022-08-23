@@ -3,16 +3,15 @@ import Story from "./Story";
 
 const StoryList = ({stories}) => {
 
-    const storyItems = stories.map( (story, index) => {
+    const storyNodes = stories.map( (story, index) => {
         return <Story key={index} story={story} />
     })
 
     return(
         <>
-            <h1>Latest Stories</h1>
-            <ul>
-                {storyItems}
-            </ul>
+            <ol>
+                {storyNodes}
+            </ol>
 
         </>
     )
