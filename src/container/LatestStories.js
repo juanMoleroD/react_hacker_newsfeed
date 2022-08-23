@@ -6,6 +6,7 @@ const LatestStories = () => {
 
     const [stories, setStories] = useState([]);
     const [filteredStories, setFilteredStories] = useState([]);
+    const [searchTerm, setSearchTerm] = useState("")
 
     const getStories = () => {
         fetch("https://hacker-news.firebaseio.com/v0/topstories.json")
@@ -25,12 +26,21 @@ const LatestStories = () => {
             })
     }
 
+    const filterResults = () => {
+        const searchInputInLowerCase = searchTerm.toLowerCase();
+        const storiesMatchingSearch = stories.filter( (story) => {
+            return story.title.toLowerCase().includes(searchInputInLowerCase);
+        })
+        setFilteredStories(storiesMatchingSearch);
+    }
+
     useEffect( () => {getStories()}, [])
+    useEffect( () => {filterResults()}, [searchTerm])
     
     return (
         <>
             <h1>Latest from HackerNews: </h1>
-            <Filter stories={stories} setFilteredStories={setFilteredStories}/>
+            <Filter searchTerm={searchTerm} setSearchTerm={setSearchTerm}/>
             <StoryList stories={filteredStories}/>
         </>
     );
